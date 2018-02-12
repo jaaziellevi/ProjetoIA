@@ -1,0 +1,24 @@
+{
+  "name": "projeto-ia",
+  "version": "1.0.0",
+  "description": "Chatbot that helps to find the car problem.",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jaaziellevi/ProjetoIA.git"
+  },
+  "author": "Jaaziel, Fabiano, Brenda",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jaaziellevi/ProjetoIA/issues"
+  },
+  "homepage": "https://github.com/jaaziellevi/ProjetoIA#readme",
+  "dependencies": {
+    "botbuilder": "^3.14.0",
+    "brain": "^0.7.0",
+    "restify": "^6.3.4"
+  }
+}
