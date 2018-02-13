@@ -19,6 +19,29 @@ var connector = new builder.ChatConnector({
 // Escuta as mensagems do usuario
 server.post('/api/messages', connector.listen());
 
+// ######################################################################
+//                                BRAIN JS
+// ######################################################################
+
+var net = new brain.NeuralNetwork();
+
+// Treino da rede neural
+net.train([
+    {input: {combustivel: 0, bateria: 0, motorPartida: 0, alarme: 0}, output: {combustivel: 1}},
+    {input: {combustivel: 0, bateria: 1, motorPartida: 1, alarme: 1}, output: {combustivel: 1}},
+    {input: {combustivel: 1, bateria: 0, motorPartida: 0, alarme: 0}, output: {bateria: 1}},
+    {input: {combustivel: 1, bateria: 0, motorPartida: 1, alarme: 0}, output: {bateria: 1}},
+    {input: {combustivel: 1, bateria: 0, motorPartida: 0, alarme: 1}, output: {bateria: 1}},
+    {input: {combustivel: 1, bateria: 0, motorPartida: 1, alarme: 1}, output: {bateria: 1}},
+    {input: {combustivel: 1, bateria: 1, motorPartida: 0, alarme: 0}, output: {motorPartida: 1}},
+    {input: {combustivel: 1, bateria: 1, motorPartida: 0, alarme: 1}, output: {motorPartida: 1}},
+    {input: {combustivel: 1, bateria: 1, motorPartida: 1, alarme: 1}, output: {alarme: 1}},
+]);
+
+// ######################################################################
+//                                BOT BUIDER
+// ######################################################################
+
 // Configuração inicial do bot
 var bot = new builder.UniversalBot(connector, [
     function(session) {
@@ -45,21 +68,20 @@ bot.dialog('naoLiga', [
     function (session) {
         session.send("Vamos ver por que seu carro não está ligando.");
         session.beginDialog('combustivel');
-    },
-    function(session, results) {
+    }, function(session, results) {
         session.dialogData.combustivel = results.response;
         session.beginDialog('bateria');
-    },
-    function(session, results) {
+    }, function(session, results){
         session.dialogData.bateria = results.response;
+        session.beginDialog('motorPartida');
+    }, function(session, results) {
+        session.dialogData.motorPartida = results.response;
         session.beginDialog('alarme');
-    },
-    function(session, results) {
+    }, function(session, results) {
         session.dialogData.alarme = results.response;
 
-        // Provisoriamente mostra as resposta do usuario
         session.send(
-            `combustivel: ${session.dialogData.combustivel}<br/>bateria: ${session.dialogData.bateria}<br/>alarme: ${session.dialogData.alarme}`
+            `${brainProcess(session.dialogData)}`
         );
         session.endDialog();
     }
@@ -74,8 +96,7 @@ bot.dialog('outroProblemaQueAindaNaoSei', function(session) {
 bot.dialog('combustivel', [
     function(session) {
         builder.Prompts.text(session, "Seu carro tem combustivel?");
-    },
-    function(session, results) {
+    }, function(session, results) {
         session.endDialogWithResult(results);
     }
 ]);
@@ -84,8 +105,16 @@ bot.dialog('combustivel', [
 bot.dialog('bateria', [
     function(session) {
         builder.Prompts.text(session, "Consegue ligar/acender os farois?");
-    },
-    function(session, results) {
+    }, function(session, results) {
+        session.endDialogWithResult(results);
+    }
+]);
+
+// Dialogo do motor de partida
+bot.dialog('motorPartida', [
+    function(session) {
+        builder.Prompts.text(session, "Quando você gira a chave o carro faz o barulho normal para ligar?");
+    }, function(session, results) {
         session.endDialogWithResult(results);
     }
 ]);
@@ -94,8 +123,7 @@ bot.dialog('bateria', [
 bot.dialog('alarme', [
     function(session) {
         builder.Prompts.text(session, "O alarme está ativado?");
-    },
-    function(session, results) {
+    }, function(session, results) {
         session.endDialogWithResult(results);
     }
 ]);
@@ -111,3 +139,41 @@ bot.dialog('help', function(session, args, next) {
         session.beginDialog(args.action, args);
     }
 });
+
+
+//#################################################################################
+//                        PROCESSAMENTO DA RESPOSTA
+//#################################################################################
+
+function getResults(res) {
+    for(var key in res){
+        if(res[key].match(/(não)|(nao)|(Não)|(Nao)|(NÂO)|(NAO)/i)){
+            res[key] = 0;
+        } else {
+            res[key] = 1;
+        }
+    }
+    return res;
+}
+
+function brainProcess(res) {
+    delete res['BotBuilder.Data.WaterfallStep'];
+    res = getResults(res);
+    var output = net.run(res);
+    return getFinalResult(output);
+}
+
+function getFinalResult(res) {
+    var vals = [];    
+    for(var i in res){
+       vals.push(res[i]);
+    }
+
+    var max = Math.max.apply(null, vals);
+
+     for(var i in res){
+        if(res[i] == max){
+            return "O problema tem " + parseFloat((res[i] * 100).toFixed(2)) + "% de chances de estar no(a) " + i;
+        }
+    }
+}
