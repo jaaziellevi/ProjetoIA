@@ -36,6 +36,10 @@ net.train([
     {input: {combustivel: 1, bateria: 1, motorPartida: 0, alarme: 0}, output: {motorPartida: 1}},
     {input: {combustivel: 1, bateria: 1, motorPartida: 0, alarme: 1}, output: {motorPartida: 1}},
     {input: {combustivel: 1, bateria: 1, motorPartida: 1, alarme: 1}, output: {alarme: 1}},
+
+    {input: {teclaAlerta: 1, fusivel: 0, releDaSeta: 1}, output: {teclaAlerta: 1}},
+    {input: {teclaAlerta: 0, fusivel: 1, releDaSeta: 0}, output: {curtoNoCarro: 1}},
+    {input: {teclaAlerta: 0, fusivel: 0, releDaSeta: 0}, output: {releDaSeta: 1}},
 ]);
 
 // ######################################################################
@@ -51,6 +55,16 @@ var bot = new builder.UniversalBot(connector, [
     }
 ]).set('storage', inMemoryStorage); // Register in-memory storage
 
+//teste para o bot enviar msg primeiro
+//bot.on('conversationUpdate', function (message) {
+        //bot.send(new builder.Message().address(message.address).text('Oi'));
+
+        //var msg = new builder.Message().address(message.address);
+        //msg.text('Opa');
+        //msg.textLocale('pt-BR');
+        //bot.send(msg);    
+//});
+
 bot.dialog("mainMenu", [
     function(session) {
         builder.Prompts.text(session, "Seu carro está ligando?");
@@ -58,7 +72,7 @@ bot.dialog("mainMenu", [
         if(results.response.match(/(não)|(nao)|(Não)|(Nao)|(NÂO)|(NAO)/i)) {
             session.beginDialog("naoLiga");
         } else if(results.response.match(/(sim)|(Sim)|(SIM)/i)) {
-            session.beginDialog("outroProblemaQueAindaNaoSei");
+            session.beginDialog("liga");
         }
     }
 ]);
@@ -87,10 +101,31 @@ bot.dialog('naoLiga', [
     }
 ]);
 
+//Dialog para resposta 'sim'
+bot.dialog('liga', [
+    function (session) {
+        session.send("Vamos ver o que pode está causando problema.");
+        session.beginDialog('teclaAlerta');
+    }, function(session, results) {
+        session.dialogData.teclaAlerta = results.response;
+        session.beginDialog('fusivel');
+    },  function(session, results) {
+        session.dialogData.fusivel = results.response;
+        session.beginDialog('releDaSeta');
+    }, function(session, results) {
+        session.dialogData.releDaSeta = results.response;
+
+        session.send(
+            `${brainProcess(session.dialogData)}`
+        );
+        session.endDialog();
+    }
+]);
+
 // Dialog provisorio para resposta 'sim'
-bot.dialog('outroProblemaQueAindaNaoSei', function(session) {
-    session.send("Por enquanto só sei trabalhar com carro que não liga :D");
-});
+//bot.dialog('outroProblemaQueAindaNaoSei', function(session) {
+    //session.send("Por enquanto só sei trabalhar com carro que não liga :D");
+//});
 
 // Dialog do combustivel
 bot.dialog('combustivel', [
@@ -128,9 +163,36 @@ bot.dialog('alarme', [
     }
 ]);
 
+// Dialog da tecla do alerta
+bot.dialog('teclaAlerta', [
+    function(session) {
+        builder.Prompts.text(session, "Mexendo na tecla várias vezes e em várias posições, o alerta funciona?");
+    }, function(session, results) {
+        session.endDialogWithResult(results);
+    }
+]);
+
+// Dialog do fusivel
+bot.dialog('fusivel', [
+    function(session) {
+        builder.Prompts.text(session, "Já trocou o fusível do pisca-alerta?");
+    }, function(session, results) {
+        session.endDialogWithResult(results);
+    }
+]);
+
+// Dialog do relé da seta
+bot.dialog('releDaSeta', [
+    function(session) {
+        builder.Prompts.text(session, "Tanto a seta como o pisca alerta funcionam?");
+    }, function(session, results) {
+        session.endDialogWithResult(results);
+    }
+]);
+
 // A pilha de dialogo é limpa e este dialogo é invocado quando o usuario digita 'help'.
 bot.dialog('help', function(session, args, next) {
-    session.endDialog("Ete é um bot para ajudar a identificar problemas com o seu veiculo. <br/>Por favor digite 'next' para continuar");
+    session.endDialog("Este é um bot para ajudar a identificar problemas com o seu veiculo. <br/>Por favor digite 'next' para continuar");
 }).triggerAction({
     matches: /^help$/i,
     onSelectAction: (session, args, next) => {
