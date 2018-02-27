@@ -1,6 +1,5 @@
 var builder = require('botbuilder'),
-    restify = require('restify'),
-    brain   = require("./brainApp.js");
+    restify = require('restify');
 
 var inMemoryStorage = new builder.MemoryBotStorage();
 
@@ -29,6 +28,7 @@ var bot = new builder.UniversalBot(connector, [
 
 // Import dos dialogs
 var naoLiga = require('./dialogs/naoLigaDialog.js')(bot);
+var motor = require('./dialogs/motorDialog.js')(bot);
 var barulho = require('./dialogs/barulhoDialog.js')(bot);
 var pisca = require('./dialogs/piscaDialog.js')(bot);
 
@@ -52,6 +52,14 @@ bot.dialog("mainMenu", [
             next();
         }
     }, function(session) {
+        builder.Prompts.text(session, "O motor anda falhando ou está fraco?");
+    }, function(session, results, next){
+        if(results.response.match(/(sim)|(Sim)|(SIM)/i)) {
+            session.beginDialog("motor");
+        } else if(results.response.match(/(não)|(nao)|(Não)|(Nao)|(NÂO)|(NAO)/i)) {
+            next();
+        }
+    }, function(session) {
         builder.Prompts.text(session, "Seu carro está com algum barulho estranho?");
     }, function(session, results, next){
         if(results.response.match(/(sim)|(Sim)|(SIM)/i)) {
@@ -71,7 +79,7 @@ bot.dialog("mainMenu", [
 ]);
 
 bot.dialog('outroProblemaQueAindaNaoSei', function(session) {
-    session.send("Então aida não sei como posso te ajudar");
+    session.send("Então, acho que seu carro não deve ter nenhum problema =D");
 });
 
 // A pilha de dialogo é limpa e este dialogo é invocado quando o usuario digita 'help'.

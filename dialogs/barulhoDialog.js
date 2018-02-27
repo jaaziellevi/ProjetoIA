@@ -38,7 +38,7 @@ module.exports = function(bot){
             session.send(
                 `${brain.brainProcess(session.dialogData)}`
             );
-            session.endDialog();
+            session.endConversation();
         }
     ]);
 
@@ -62,7 +62,7 @@ module.exports = function(bot){
             session.send(
                 `${brain.brainProcess(session.dialogData)}`
             );
-            session.endDialog();
+            session.endConversation();
         }
     ]);
 
@@ -80,7 +80,7 @@ module.exports = function(bot){
             session.send(
                 `${brain.brainProcess(session.dialogData)}`
             );
-            session.endDialog();
+            session.endConversation();
         }
     ]);
 

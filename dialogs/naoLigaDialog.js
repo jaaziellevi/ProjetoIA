@@ -3,7 +3,6 @@ var builder = require('botbuilder'),
 
 module.exports = function(bot){
     bot.dialog('naoLiga', [
-        //Dialog para resposta 'não'
         function (session) {
             session.send("Vamos ver por que seu carro não está ligando.");
             session.beginDialog('combustivel');
@@ -22,7 +21,7 @@ module.exports = function(bot){
             session.send(
                 `${brain.brainProcess(session.dialogData)}`
             );
-            session.endDialog();
+            session.endConversation();
         }
     ]);
 
