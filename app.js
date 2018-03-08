@@ -31,6 +31,7 @@ var naoLiga = require('./dialogs/naoLigaDialog.js')(bot);
 var motor = require('./dialogs/motorDialog.js')(bot);
 var barulho = require('./dialogs/barulhoDialog.js')(bot);
 var pisca = require('./dialogs/piscaDialog.js')(bot);
+var painel = require('./dialogs/painelDialog.js')(bot);
 
 //teste para o bot enviar msg primeiro
 //bot.on('conversationUpdate', function (message) {
@@ -67,6 +68,15 @@ bot.dialog("mainMenu", [
         } else if(results.response.match(/(não)|(nao)|(Não)|(Nao)|(NÂO)|(NAO)/i)) {
             next();
         }
+    }, function(session) {
+        builder.Prompts.text(session, "Seu carro está com luzes de painel acesas?");
+    }, function(session, results, next){
+        if(results.response.match(/(sim)|(Sim)|(SIM)/i)) {
+            session.beginDialog("painel");
+        } else if(results.response.match(/(não)|(nao)|(Não)|(Nao)|(NÂO)|(NAO)/i)) {
+            next();
+        }
+
     }, function(session) {
         builder.Prompts.text(session, "O pisca alerta está funcionado?");
     }, function(session, results, next) {

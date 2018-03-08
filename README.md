@@ -3,7 +3,7 @@
 # Alunos:
   * Jaaziel Moura
   * Fabiano Laureano
-  * Brenda
+  * Brendha Cruz
 
 # Para executar:
   * Você deve ter o NodeJS instalado no PC
