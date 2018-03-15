@@ -87,11 +87,8 @@ net.train([
     {input: {painel: 1, oleoLuz: 1, nivel: 1, limpo: 1, emdia: 0}, output: {emdia: 1}},
     {input: {painel: 0.5, agua: 1}, output: {agua: 1}},
     {input: {painel: 0, puxado: 1}, output: {puxado: 1}}
-    
-    
 
-
-]);
+], {log: true});
 
 exports.brainProcess = function (res) {
     delete res['BotBuilder.Data.WaterfallStep'];
