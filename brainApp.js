@@ -100,10 +100,9 @@ net.train([
     {input: {painel: 0.5, vapor: 0, velocidade: 0, aguaN: 0, ventilador: 1}, output: {aguaN: 1}},
     {input: {painel: 0.5, vapor: 0, velocidade: 0, aguaN: 1, ventilador: 0}, output: {ventilador: 1}}
     
-    
 
 
-]);
+], {log: true});
 
 exports.brainProcess = function (res) {
     delete res['BotBuilder.Data.WaterfallStep'];
