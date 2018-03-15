@@ -32,7 +32,12 @@ var problemas = {
     vapor: 'ser água do motor vazia.<br/>Espere o motor esfriar, acione o mesmo em marcha lenta com o carro parado até que a luz apague.<br/>Caso não apague, pare imediatamente.',
     velocidade: 'ser excesso de aquecimento do motor.<br/>Espere o motor esfriar.<br/>Verificar Radiador ou Bomba de água.',
     aguaN: 'ser água do motor vazia ou não está passando.<br/>Complete o nível de líquido com o motor frio.<br/>Verificar Radiador, Bomba de água ou Mangueiras.',
-    ventilador: 'o ventilador não estar funcionando corretamente.<br/>Desligue o motor e procure assistencia'
+    ventilador: 'o ventilador não estar funcionando corretamente.<br/>Desligue o motor e procure assistencia',
+    troca: 'ser necessário realizar uma troca de pneu.<br/>Siga os seguintes passos: <br/>1 - Estacione numa superfície plana, se possível.<br/>2 - Ligue o pisca alerta e puxe o freio de mão.<br/>3 - Engrene na primeira marcha.<br/>4 - Coloque o triângulo de segurança atrás do veículo a uma certa distância.<br/>5 - Calce a roda diagonalmente oposta à que vai ser substituída.<br/>6 - Remova a calota central ou cobertura dos parafusos.<br/>7 - Com a chave de roda, afrouxe os parafusos meia a uma volta, mas não os remova.<br/>8 - Posicione o braço do macaco no encaixe mais próximo da roda a ser substituída, e levante o veículo.<br/>9 - Retire os parafusos e substitua a roda.<br/>10 - Reinstale os parafusos, apertando-os parcialmeente.<br/>11 - Abaixe o veículo e aperte os parafusos em sequencia cruzada.<br/>12 - Guarde todo o material e mande reparar o pneu avariado o mais rápido possível.',
+    baixo: 'ser o pneu descalibrado ou furado.<br/>Calibre o pneu com a medida indicada pelo fabricante.',
+    careca: 'ser o pneu careca.<br/>Troque de pneu o mais rápido possível.',
+    incompativel: 'ser o pneu incompatível com o modelo do veículo.<br/>Troque por um pneu com as medidas compatíveis ao seu automóvel.',
+    pneu: 'ser necessário uma troca de pneu.'
 };
 
 net.train([
@@ -45,13 +50,11 @@ net.train([
     {input: {combustivel: 1, bateria: 1, motorPartida: 0, alarme: 0}, output: {motorPartida: 1}},
     {input: {combustivel: 1, bateria: 1, motorPartida: 0, alarme: 1}, output: {motorPartida: 1}},
     {input: {combustivel: 1, bateria: 1, motorPartida: 1, alarme: 1}, output: {alarme: 1}},
-
     {input: {teclaAlerta: 0, fusivel: 0, releDaSeta: 1}, output: {teclaAlerta: 1}},
     {input: {teclaAlerta: 0, fusivel: 1, releDaSeta: 1}, output: {teclaAlerta: 1}},
     {input: {teclaAlerta: 0, fusivel: 1, releDaSeta: 0}, output: {curtoNoCarro: 1}},
     {input: {teclaAlerta: 0, fusivel: 0, releDaSeta: 0}, output: {releDaSeta: 1}},
     {input: {teclaAlerta: 0, fusivel: 1, releDaSeta: 0}, output: {releDaSeta: 1}},
-
     {input: {parteCarro: 0, freio: 1, volante: 0, buraco: 0, batida: 0}, output: {freio: 1}},
     {input: {parteCarro: 0, freio: 1, volante: 0, buraco: 1, batida: 0}, output: {freio: 1}},
     {input: {parteCarro: 0, freio: 1, volante: 0, buraco: 1, batida: 1}, output: {freio: 1}},
@@ -69,7 +72,6 @@ net.train([
     {input: {parteCarro: 1, passageiro: 1, batida: 0}, output: {passageiro: 1}},
     {input: {parteCarro: 1, passageiro: 1, batida: 1}, output: {batida: 1}},
     {input: {parteCarro: 1, passageiro: 0, batida: 1}, output: {batida: 1}},
-
     {input: {motorFraco: 1, oleo: 0, injecao: 0, fumaca: 0}, output: {motorFraco: 1}},
     {input: {motorFraco: 1, oleo: 1, injecao: 0, fumaca: 0}, output: {oleo: 1}},
     {input: {motorFraco: 1, oleo: 1, injecao: 0, fumaca: 1}, output: {oleo: 1}},
@@ -79,7 +81,6 @@ net.train([
     {input: {motorFraco: 1, oleo: 0, injecao: 1, fumaca: 1}, output: {injecao: 1}},
     {input: {motorFraco: 1, oleo: 1, injecao: 1, fumaca: 0}, output: {injecao: 1}},
     {input: {motorFraco: 1, oleo: 0, injecao: 0, fumaca: 1}, output: {fumaca: 1}},
-
     {input: {painel: 1, oleoLuz: 1, nivel: 1, limpo: 1, emdia: 1}, output: {oleoLuz: 1}},
     {input: {painel: 1, oleoLuz: 1, nivel: 0, limpo: 1, emdia: 1}, output: {nivel: 1}},
     {input: {painel: 1, oleoLuz: 1, nivel: 0, limpo: 0, emdia: 1}, output: {nivel: 1}},
@@ -93,14 +94,18 @@ net.train([
     {input: {painel: 0, puxado: 1, pastilha: 0, fluido: 1}, output: {puxado: 1}},
     {input: {painel: 0, puxado: 0, pastilha: 0, fluido: 1}, output: {pastilha: 1}},
     {input: {painel: 0, puxado: 0, pastilha: 1, fluido: 1}, output: {pastilha: 1}},
-    {input: {painel: 0, puxado: 0, pastilha: 0, fluido: 0}, output: {fluido: 1}},
+    {input: {painel: 0, puxado: 0, pastilha: 0, fluido: 0}, output: {fluido: 0}},
     {input: {painel: 0.5, vapor: 1, velocidade: 1, aguaN: 1, ventilador: 1}, output: {vapor: 1}},
     {input: {painel: 0.5, vapor: 0, velocidade: 1, aguaN: 1, ventilador: 1}, output: {velocidade: 1}},
     {input: {painel: 0.5, vapor: 0, velocidade: 0, aguaN: 1, ventilador: 1}, output: {aguaN: 1}},
     {input: {painel: 0.5, vapor: 0, velocidade: 0, aguaN: 0, ventilador: 1}, output: {aguaN: 1}},
-    {input: {painel: 0.5, vapor: 0, velocidade: 0, aguaN: 1, ventilador: 0}, output: {ventilador: 1}}
-    
-
+    {input: {painel: 0.5, vapor: 0, velocidade: 0, aguaN: 1, ventilador: 0}, output: {ventilador: 1}},
+    {input: {pneu: 1, baixo: 1, estourado: 0, careca: 0, incompativel:0}, output: {baixo: 1}},
+    {input: {pneu: 1, baixo: 0, estourado: 1, careca: 0, incompativel:0}, output: {troca: 1}},
+    {input: {pneu: 1, baixo: 0, estourado: 0, careca: 1, incompativel:0}, output: {careca: 1}},
+    {input: {pneu: 1, baixo: 0, estourado: 0, careca: 0, incompativel:1}, output: {incompativel: 1}},
+    {input: {pneu: 1, baixo: 0, estourado: 0, careca: 1, incompativel:1}, output: {incompativel: 1}},
+    {input: {pneu: 1, baixo: 1, estourado: 0, careca: 1, incompativel:0}, output: {pneu: 1}}
 
 ], {log: true});
 

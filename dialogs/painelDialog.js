@@ -88,7 +88,7 @@ module.exports = function(bot){
 
     bot.dialog('oleoLuz', [
         function(session) {
-            builder.Prompts.text(session, "A luz de óleo do motor está acesa, ou acende com o carro andando?");
+            builder.Prompts.text(session, "A luz de óleo do motor está acesa ou acende com o carro andando?");
         }, function(session, results) {
             session.endDialogWithResult(results);
         }
