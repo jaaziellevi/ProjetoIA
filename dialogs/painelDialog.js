@@ -46,10 +46,18 @@ module.exports = function(bot){
         function(session) {
             session.send("Certo");
             session.dialogData.painel = 0.5;
+            session.beginDialog('vapor');
+        }, function(session, results) {
+            session.dialogData.vapor = results.response;
+            session.beginDialog('velocidade');
+        }, function(session, results) {
+            session.dialogData.velocidade = results.response;
             session.beginDialog('aguaN');
         }, function(session, results) {
             session.dialogData.aguaN = results.response;
-            
+            session.beginDialog('ventilador');
+        }, function(session, results) {
+            session.dialogData.ventilador = results.response;
             session.send(
                 `${brain.brainProcess(session.dialogData)}`
             );
@@ -64,7 +72,12 @@ module.exports = function(bot){
             session.beginDialog('puxado');
         }, function(session, results) {
             session.dialogData.puxado = results.response;
-          
+            session.beginDialog('pastilha');
+        }, function(session, results) {
+            session.dialogData.pastilha = results.response;
+            session.beginDialog('fluido');
+        }, function(session, results) {
+            session.dialogData.fluido = results.response;
             session.send(
                 `${brain.brainProcess(session.dialogData)}`
             );
@@ -113,12 +126,55 @@ module.exports = function(bot){
         }
     ]);
 
-    bot.dialog('aguaN', [
+
+    bot.dialog('pastilha', [
         function(session) {
-            builder.Prompts.text(session, "A água do motor está no nível correto?");
+            builder.Prompts.text(session, "A luz acendeu por frenagens e acelerações fortes?");
         }, function(session, results) {
             session.endDialogWithResult(results);
         }
     ]);
+
+    bot.dialog('fluido', [
+        function(session) {
+            builder.Prompts.text(session, "O nível do fluido está entre as marcas MAX e MIN?");
+        }, function(session, results) {
+            session.endDialogWithResult(results);
+        }
+    ]);
+
+    bot.dialog('vapor', [
+        function(session) {
+            builder.Prompts.text(session, "Está saindo vapor na região do motor?");
+        }, function(session, results) {
+            session.endDialogWithResult(results);
+        }
+    ]);
+
+    bot.dialog('velocidade', [
+        function(session) {
+            builder.Prompts.text(session, "Você dirigiu em subida íngrime em altas temperaturas, ou dirigiu em alta velocidade, ou dirigiu em marcha lenta por um longo período?");
+        }, function(session, results) {
+            session.endDialogWithResult(results);
+        }
+    ]);
+
+    bot.dialog('aguaN', [
+        function(session) {
+            builder.Prompts.text(session, "O nível do líquido de arrefecimento está no máximo?");
+        }, function(session, results) {
+            session.endDialogWithResult(results);
+        }
+    ]);
+
+    bot.dialog('ventilador', [
+        function(session) {
+            builder.Prompts.text(session, "O ventilador do motor está funcionando?");
+        }, function(session, results) {
+            session.endDialogWithResult(results);
+        }
+    ]);
+
+  
 
 }

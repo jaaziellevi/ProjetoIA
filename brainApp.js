@@ -13,6 +13,8 @@ var problemas = {
     releDaSeta: "do rele da seta está queimado.",
     freio: "ser a pinça do freio.",
     puxado: "o freio de mão está puxado.",
+    pastilha: "ser as pastilhas de freio desgastadas.<br/> Procure uma Oficina para troca das pastilhas.",
+    fluido: "ser o nível de fluido de freio fora do recomendado.<br/>Procure uma Oficina para verificação do mesmo.",
     volante: "ser alguma folga na fixação dos amortecedores.",
     buraco: "ser o coxim do motor quebrado.",
     batida: "ser alguma peça quebrado ou solta em decorrencia da batida.",
@@ -27,7 +29,10 @@ var problemas = {
     nivel: `ser óleo abaixo do nível.<br/>Complete com urgencia`,
     limpo: `ser óleo cheio de impurezas ou queimado.<br/>Realize uma troca de óleo.`,
     emdia: `ser óleo vencido.<br/>Realize uma troca de óleo.`,
-    agua: 'ser água do motor vazia.<br/>Complete o nível de água com o motor frio.<br/>Verificar Radiador ou Bomba de água.'
+    vapor: 'ser água do motor vazia.<br/>Espere o motor esfriar, acione o mesmo em marcha lenta com o carro parado até que a luz apague.<br/>Caso não apague, pare imediatamente.',
+    velocidade: 'ser excesso de aquecimento do motor.<br/>Espere o motor esfriar.<br/>Verificar Radiador ou Bomba de água.',
+    aguaN: 'ser água do motor vazia ou não está passando.<br/>Complete o nível de líquido com o motor frio.<br/>Verificar Radiador, Bomba de água ou Mangueiras.',
+    ventilador: 'o ventilador não estar funcionando corretamente.<br/>Desligue o motor e procure assistencia'
 };
 
 net.train([
@@ -85,8 +90,15 @@ net.train([
     {input: {painel: 1, oleoLuz: 0, nivel: 1, limpo: 0, emdia: 1}, output: {limpo: 1}},
     {input: {painel: 1, oleoLuz: 1, nivel: 1, limpo: 0, emdia: 1}, output: {limpo: 1}},
     {input: {painel: 1, oleoLuz: 1, nivel: 1, limpo: 1, emdia: 0}, output: {emdia: 1}},
-    {input: {painel: 0.5, agua: 1}, output: {agua: 1}},
-    {input: {painel: 0, puxado: 1}, output: {puxado: 1}}
+    {input: {painel: 0, puxado: 1, pastilha: 0, fluido: 1}, output: {puxado: 1}},
+    {input: {painel: 0, puxado: 0, pastilha: 0, fluido: 1}, output: {pastilha: 1}},
+    {input: {painel: 0, puxado: 0, pastilha: 1, fluido: 1}, output: {pastilha: 1}},
+    {input: {painel: 0, puxado: 0, pastilha: 0, fluido: 0}, output: {fluido: 1}},
+    {input: {painel: 0.5, vapor: 1, velocidade: 1, aguaN: 1, ventilador: 1}, output: {vapor: 1}},
+    {input: {painel: 0.5, vapor: 0, velocidade: 1, aguaN: 1, ventilador: 1}, output: {velocidade: 1}},
+    {input: {painel: 0.5, vapor: 0, velocidade: 0, aguaN: 1, ventilador: 1}, output: {aguaN: 1}},
+    {input: {painel: 0.5, vapor: 0, velocidade: 0, aguaN: 0, ventilador: 1}, output: {aguaN: 1}},
+    {input: {painel: 0.5, vapor: 0, velocidade: 0, aguaN: 1, ventilador: 0}, output: {ventilador: 1}}
     
     
 
