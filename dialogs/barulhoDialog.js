@@ -7,11 +7,11 @@ module.exports = function(bot){
             session.send("Vamos tentar identificar o motivo do barulho.");
             builder.Prompts.text(session, "Em qual parte do carro é o barulho? (frente, meio, traseira)");
         }, function(session, results) {
-            if(results.response.match(/(dianteira)|(frente)/i)) {
+            if(results.response.match(/(dianteira)|(frente)|(motor)/i)) {
                 session.beginDialog('dianteira');
-            } else if(results.response.match(/(meio)/i)) {
+            } else if(results.response.match(/(meio)|(cabine)/i)) {
                 session.beginDialog('meio');
-            } else if(results.response.match(/(traseira)|(atras)|(fundo)/i)) {
+            } else if(results.response.match(/(traseira)|(atras)|(fundo)|(porta-mala)|(porta mala)/i)) {
                 session.beginDialog('traseira');
             } else {
                 session.send("Desculpe, não consegui te enteder. Onde é mesmo o barulho?");
